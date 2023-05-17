@@ -3,10 +3,10 @@
  * @Author: 谭海军
  * @Date: 2023-05-15 22:07:52
  * @LastEditors: 谭海军
- * @LastEditTime: 2023-05-16 17:23:04
+ * @LastEditTime: 2023-05-17 11:52:53
 -->
 <template>
-  <button
+  <!-- <button
     @click="
       increment();
       mutateDeeply();
@@ -15,11 +15,18 @@
   <div>{{ state.count }}</div>
   <div></div>
   <button @click="test()"></button>
-  {{ state1.count }}
+  {{ state1.count }} -->
+
+  <button @click="refTest()"></button>
+  <!-- 使用表达式refObj.foo无法直接获取值 需要将该属性改为顶层 -->
+  {{ 'foo:' + refObj.foo.value }}
+  {{ 'bar:' + refObj.bar }}
+  <!-- 是最终值时可使用-->
+  'bar:'{{ refObj.bar }}
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 
 /**
  * Vue2.0
@@ -98,6 +105,35 @@ let test = (): void => {
   // };
   // testNum(state1.count);
 };
+
+// 通过ref()创建任何类型的响应式ref
+const count = ref(0);
+console.log(count);
+console.log(count.value);
+count.value++;
+console.log(count.value);
+
+const refObj: rawObject = {
+  foo: ref(1),
+  bar: ref(2)
+};
+
+// 被嵌套进响应式对象后可直接访问
+
+let otherCount = ref(1);
+const refObj2 = reactive({
+  otherCount
+});
+console.log(refObj.foo); // RefImpl
+console.log(refObj2.otherCount); // 1
+
+// 数组和集合中不会解包
+const books = reactive([ref('bookName')]);
+console.log(books[0]);
+
+const map = reactive(new Map([['count', ref(0)]]));
+// 这里需要 .value
+console.log(map.get('count')?.value);
 </script>
 
 <style></style>
